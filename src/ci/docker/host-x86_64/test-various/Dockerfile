@@ -74,7 +74,7 @@ ENV WASM_BARE_TARGET=wasm32-unknown-unknown \
   CC_wasm32_unknown_unknown=clang-11 \
   CXX_wasm32_unknown_unknown=clang++-11
 ENV WASM_BARE_SCRIPT python3 /checkout/x.py --stage 2 test --host='' --target $WASM_BARE_TARGET \
-  tests/run-make/wasm-builtins-no-linker-warning
+  tests/ui/wasm/wasm-builtins-no-linker-warning.rs
 
 ENV NVPTX_TARGETS=nvptx64-nvidia-cuda
 ENV NVPTX_SCRIPT python3 /checkout/x.py --stage 2 test --host='' --target $NVPTX_TARGETS \
