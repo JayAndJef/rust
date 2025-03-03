@@ -319,9 +319,9 @@ than building it.
             && (build.config.optimized_compiler_builtins(*target)
                 || build.config.rust_std_features.contains("compiler-builtins-c"))
         {
-            let is_gcc = is_gcc_compiler(build.cc(*target), build);
-            if is_gcc {
-                panic!("GCC does not support building c code for bare wasm");
+            let is_clang = is_clang_compiler(build.cc(*target), build);
+            if !is_clang {
+                panic!("only clang supports building c code for wasm targets");
             }
         }
 
@@ -388,7 +388,15 @@ $ pacman -R cmake && pacman -S mingw-w64-x86_64-cmake
     }
 }
 
-fn is_gcc_compiler(path: PathBuf, build: &Build) -> bool {
-    let cc_output = command(&path).arg("--version").run_capture_stdout(build).stdout();
-    cc_output.contains("GCC")
+/// checks if the compiler at `path` is clang by looking at defined macros
+fn is_clang_compiler(path: PathBuf, build: &Build) -> bool {
+    let cc_output = command(&path)
+        .arg("-E") // preprocess only
+        .arg("-dM") // dump defines
+        .arg("-x")
+        .arg("c")
+        .arg("/dev/null")
+        .run_capture_stdout(build)
+        .stdout();
+    cc_output.contains("#define __clang__ 1")
 }
